@@ -1,0 +1,33 @@
+// Meta-function to remove modifiers like const, &, *, [], etc.
+template <typename T>
+struct RemoveModifiers {
+    using type = T;
+};
+
+template <typename T>
+struct RemoveModifiers<T const> : RemoveModifiers<T> {};
+
+template <typename T>
+struct RemoveModifiers<T&> : RemoveModifiers<T> {};
+
+template <typename T>
+struct RemoveModifiers<T*> : RemoveModifiers<T> {};
+
+// Meta-function to get the true type without modifiers
+template <typename T>
+struct TrueType {
+    using type = typename RemoveModifiers<T>::type;
+};
+
+// Example usage:
+#include <iostream>
+
+int main() {
+    using OriginalType = const int&;
+    using CleanedType = typename TrueType<OriginalType>::type;
+
+    std::cout << "Original Type: " << typeid(OriginalType).name() << std::endl;
+    std::cout << "Cleaned Type: " << typeid(CleanedType).name() << std::endl;
+
+    return 0;
+}
