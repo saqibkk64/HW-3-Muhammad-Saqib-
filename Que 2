@@ -1,0 +1,18 @@
+#include <iostream>
+
+template <int N, int K>
+struct SequenceSum {
+    static constexpr int value = N + SequenceSum<N, K - 1>::value * N;
+};
+
+template <int N>
+struct SequenceSum<N, 0> {
+    static constexpr int value = 0;
+};
+
+int main() {
+    constexpr int result = SequenceSum<2, 3>::value;
+    std::cout << "Sum of sequence F(2, 3): " << result << std::endl;
+
+    return 0;
+}
