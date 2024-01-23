@@ -1,0 +1,123 @@
+#include <iostream>
+#include <vector>
+#include <cmath>
+#include <cassert>
+
+template <typename T, size_t Rows, size_t Cols>
+class Matrix {
+private:
+    std::vector<std::vector<T>> data;
+
+public:
+    Matrix() : data(Rows, std::vector<T>(Cols)) {}
+
+    // Function to get element at (i, j)
+    T& operator()(size_t i, size_t j) {
+        return data[i][j];
+    }
+
+    // Matrix addition
+    Matrix operator+(const Matrix& other) const {
+        Matrix result;
+        for (size_t i = 0; i < Rows; ++i) {
+            for (size_t j = 0; j < Cols; ++j) {
+                result(i, j) = (*this)(i, j) + other(i, j);
+            }
+        }
+        return result;
+    }
+
+    // Matrix subtraction
+    Matrix operator-(const Matrix& other) const {
+        Matrix result;
+        for (size_t i = 0; i < Rows; ++i) {
+            for (size_t j = 0; j < Cols; ++j) {
+                result(i, j) = (*this)(i, j) - other(i, j);
+            }
+        }
+        return result;
+    }
+
+    // Matrix multiplication
+    template <size_t N>
+    Matrix<T, Rows, N> operator*(const Matrix<T, Cols, N>& other) const {
+        Matrix<T, Rows, N> result;
+        for (size_t i = 0; i < Rows; ++i) {
+            for (size_t j = 0; j < N; ++j) {
+                for (size_t k = 0; k < Cols; ++k) {
+                    result(i, j) += (*this)(i, k) * other(k, j);
+                }
+            }
+        }
+        return result;
+    }
+
+    // Scalar multiplication
+    Matrix operator*(const T& scalar) const {
+        Matrix result;
+        for (size_t i = 0; i < Rows; ++i) {
+            for (size_t j = 0; j < Cols; ++j) {
+                result(i, j) = (*this)(i, j) * scalar;
+            }
+        }
+        return result;
+    }
+
+    // Transpose matrix
+    Matrix<T, Cols, Rows> transpose() const {
+        Matrix<T, Cols, Rows> result;
+        for (size_t i = 0; i < Rows; ++i) {
+            for (size_t j = 0; j < Cols; ++j) {
+                result(j, i) = (*this)(i, j);
+            }
+        }
+        return result;
+    }
+};
+
+// Specialization for vectors (size n, 1) with 'int' type
+template <size_t Rows>
+class Matrix<int, Rows, 1> {
+private:
+    std::vector<std::vector<int>> data;
+
+public:
+    Matrix() : data(Rows, std::vector<int>(1)) {}
+
+    int& operator()(size_t i) {
+        return data[i][0];
+    }
+
+    // L2 norm calculation for vectors
+    double norm() const {
+        int sum = 0;
+        for (size_t i = 0; i < Rows; ++i) {
+            sum += data[i][0] * data[i][0];
+        }
+        return std::sqrt(static_cast<double>(sum));
+    }
+};
+
+int main() {
+    // Example usage
+    Matrix<int, 2, 3> matrix1;
+    Matrix<int, 3, 4> matrix2;
+
+    // Matrix addition
+    Matrix<int, 2, 3> result_addition = matrix1 + matrix1;
+
+    // Matrix multiplication
+    Matrix<int, 2, 4> result_multiplication = matrix1 * matrix2;
+
+    // Scalar multiplication
+    Matrix<int, 2, 3> result_scalar_multiplication = matrix1 * 2;
+
+    // Transpose
+    Matrix<int, 3, 2> result_transpose = matrix1.transpose();
+
+    // Vector (size 3, 1) with 'int' type
+    Matrix<int, 3, 1> vector;
+    double vector_norm = vector.norm();
+
+    return 0;
+}
